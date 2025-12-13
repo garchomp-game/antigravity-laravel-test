@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHPUnit テスト解説 - Laravel</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-base-200">
+    <!-- Navbar -->
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="flex-1">
+            <a href="index.html" class="btn btn-ghost text-xl">📚 Laravel テスト・監査ドキュメント</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="phpunit.html" class="font-bold text-primary">PHPUnit</a></li>
+                <li><a href="dusk.html">Laravel Dusk</a></li>
+                <li><a href="audit.html">監査ログ</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-accent to-primary py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold text-white mb-4">🧪 PHPUnit テスト</h1>
+            <p class="text-white/80">Unit TestとFeature Testでアプリケーションの品質を保証</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-12">
+
+        <!-- Unit vs Feature -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">📊 Unit Test vs Feature Test</h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Unit Test -->
+                    <div class="border-2 border-accent rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-accent mb-4">🔬 Unit Test</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-accent">目的</span>
+                                <span>単一クラス・メソッドの動作検証</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-accent">スコープ</span>
+                                <span>Service, Model, Helper など</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-accent">外部依存</span>
+                                <span>モック・スタブで置換</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-accent">速度</span>
+                                <span>⚡ 非常に高速</span>
+                            </div>
+                        </div>
+
+                        <div class="mockup-code mt-6">
+                            <pre data-prefix="1"><code>// tests/Unit/TicketServiceTest.php</code></pre>
+                            <pre data-prefix="2"><code>class TicketServiceTest extends TestCase</code></pre>
+                            <pre data-prefix="3"><code>{</code></pre>
+                            <pre data-prefix="4" class="text-success"><code>    /** @test */</code></pre>
+                            <pre data-prefix="5"><code>    public function it_can_create_a_ticket()</code></pre>
+                            <pre data-prefix="6"><code>    {</code></pre>
+                            <pre data-prefix="7"><code>        $service = app(TicketService::class);</code></pre>
+                            <pre data-prefix="8"><code>        $ticket = $service->createTicket([</code></pre>
+                            <pre data-prefix="9"><code>            'title' => 'Test',</code></pre>
+                            <pre data-prefix="10"><code>            'type' => 'incident'</code></pre>
+                            <pre data-prefix="11"><code>        ]);</code></pre>
+                            <pre data-prefix="12"
+                                class="text-warning"><code>        $this->assertInstanceOf(Ticket::class, $ticket);</code></pre>
+                            <pre data-prefix="13"><code>    }</code></pre>
+                            <pre data-prefix="14"><code>}</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Feature Test -->
+                    <div class="border-2 border-primary rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-primary mb-4">🔗 Feature Test</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-primary">目的</span>
+                                <span>複数コンポーネントの統合動作検証</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-primary">スコープ</span>
+                                <span>HTTP, Livewire, DB連携</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-primary">外部依存</span>
+                                <span>実際のDB・セッション使用</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="badge badge-primary">速度</span>
+                                <span>🚶 中程度</span>
+                            </div>
+                        </div>
+
+                        <div class="mockup-code mt-6">
+                            <pre data-prefix="1"><code>// tests/Feature/TicketFeatureTest.php</code></pre>
+                            <pre data-prefix="2"><code>class TicketFeatureTest extends TestCase</code></pre>
+                            <pre data-prefix="3"><code>{</code></pre>
+                            <pre data-prefix="4" class="text-success"><code>    use RefreshDatabase;</code></pre>
+                            <pre data-prefix="5"><code></code></pre>
+                            <pre data-prefix="6"><code>    /** @test */</code></pre>
+                            <pre data-prefix="7"><code>    public function user_can_view_ticket_list()</code></pre>
+                            <pre data-prefix="8"><code>    {</code></pre>
+                            <pre data-prefix="9"><code>        Livewire::test('tickets.index')</code></pre>
+                            <pre data-prefix="10"
+                                class="text-warning"><code>            ->assertSee('Tickets');</code></pre>
+                            <pre data-prefix="11"><code>    }</code></pre>
+                            <pre data-prefix="12"><code>}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Flow Diagram -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">🔄 TDD サイクル (Red-Green-Refactor)</h2>
+
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-4 py-8">
+                    <!-- Red -->
+                    <div class="flex flex-col items-center">
+                        <div
+                            class="w-32 h-32 bg-error rounded-full flex items-center justify-center text-error-content">
+                            <div class="text-center">
+                                <div class="text-3xl">❌</div>
+                                <div class="font-bold">RED</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm text-center">失敗するテストを書く</div>
+                    </div>
+
+                    <div class="text-4xl text-primary hidden lg:block">→</div>
+                    <div class="text-4xl text-primary lg:hidden">↓</div>
+
+                    <!-- Green -->
+                    <div class="flex flex-col items-center">
+                        <div
+                            class="w-32 h-32 bg-success rounded-full flex items-center justify-center text-success-content">
+                            <div class="text-center">
+                                <div class="text-3xl">✅</div>
+                                <div class="font-bold">GREEN</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm text-center">テストが通るコードを書く</div>
+                    </div>
+
+                    <div class="text-4xl text-primary hidden lg:block">→</div>
+                    <div class="text-4xl text-primary lg:hidden">↓</div>
+
+                    <!-- Refactor -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-32 h-32 bg-info rounded-full flex items-center justify-center text-info-content">
+                            <div class="text-center">
+                                <div class="text-3xl">🔧</div>
+                                <div class="font-bold">REFACTOR</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm text-center">コードを改善する</div>
+                    </div>
+
+                    <div class="text-4xl text-primary hidden lg:block">→</div>
+                    <div class="text-4xl text-primary lg:hidden">↓</div>
+
+                    <!-- Back to Red -->
+                    <div class="flex flex-col items-center opacity-50">
+                        <div
+                            class="w-20 h-20 bg-error rounded-full flex items-center justify-center text-error-content">
+                            <div class="text-center">
+                                <div class="text-xl">🔁</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm text-center">繰り返す</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Important Traits -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">🛠️ 重要なトレイト</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="alert alert-info">
+                        <div>
+                            <h3 class="font-bold">RefreshDatabase</h3>
+                            <p class="text-sm">各テスト後にDBをマイグレーションからやり直す。テスト間の独立性を保証。</p>
+                            <code class="text-xs mt-2 block">use Illuminate\Foundation\Testing\RefreshDatabase;</code>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <div>
+                            <h3 class="font-bold">DatabaseTransactions</h3>
+                            <p class="text-sm">各テストをトランザクションでラップし、終了後ロールバック。RefreshDatabaseより高速。</p>
+                            <code
+                                class="text-xs mt-2 block">use Illuminate\Foundation\Testing\DatabaseTransactions;</code>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div>
+                            <h3 class="font-bold">WithFaker</h3>
+                            <p class="text-sm">Fakerインスタンスを提供。ランダムなテストデータ生成に便利。</p>
+                            <code class="text-xs mt-2 block">use Illuminate\Foundation\Testing\WithFaker;</code>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-error">
+                        <div>
+                            <h3 class="font-bold">DatabaseMigrations</h3>
+                            <p class="text-sm">⚠️ Duskでは使用不可（別プロセスのためDB共有されない）</p>
+                            <code
+                                class="text-xs mt-2 block">use Illuminate\Foundation\Testing\DatabaseMigrations;</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commands -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">⌨️ よく使うコマンド</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>コマンド</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code class="text-primary">php artisan test</code></td>
+                                <td>全テスト実行</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-primary">php artisan test --filter=TicketServiceTest</code></td>
+                                <td>特定のテストクラスのみ実行</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-primary">php artisan test --filter=it_can_create</code></td>
+                                <td>テストメソッド名でフィルタ</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-primary">php artisan test --parallel</code></td>
+                                <td>並列実行（高速化）</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-primary">php artisan make:test TicketTest</code></td>
+                                <td>Feature テスト作成</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-primary">php artisan make:test TicketTest --unit</code></td>
+                                <td>Unit テスト作成</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assertions Reference -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">✅ よく使うアサーション</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mockup-code">
+                        <pre data-prefix=""><code class="text-success">// 基本アサーション</code></pre>
+                        <pre data-prefix=""><code>$this->assertTrue($value);</code></pre>
+                        <pre data-prefix=""><code>$this->assertEquals('expected', $actual);</code></pre>
+                        <pre data-prefix=""><code>$this->assertCount(5, $array);</code></pre>
+                        <pre data-prefix=""><code>$this->assertNull($value);</code></pre>
+                    </div>
+
+                    <div class="mockup-code">
+                        <pre data-prefix=""><code class="text-success">// DBアサーション</code></pre>
+                        <pre data-prefix=""><code>$this->assertDatabaseHas('tickets', [</code></pre>
+                        <pre data-prefix=""><code>    'title' => 'Test Ticket'</code></pre>
+                        <pre data-prefix=""><code>]);</code></pre>
+                        <pre data-prefix=""><code>$this->assertDatabaseMissing('tickets', [...]);</code></pre>
+                    </div>
+
+                    <div class="mockup-code">
+                        <pre data-prefix=""><code class="text-success">// HTTPアサーション</code></pre>
+                        <pre data-prefix=""><code>$response->assertStatus(200);</code></pre>
+                        <pre data-prefix=""><code>$response->assertRedirect('/login');</code></pre>
+                        <pre data-prefix=""><code>$response->assertSee('Welcome');</code></pre>
+                    </div>
+
+                    <div class="mockup-code">
+                        <pre data-prefix=""><code class="text-success">// Livewireアサーション</code></pre>
+                        <pre data-prefix=""><code>Livewire::test('tickets.index')</code></pre>
+                        <pre data-prefix=""><code>    ->set('search', 'test')</code></pre>
+                        <pre data-prefix=""><code>    ->call('filter')</code></pre>
+                        <pre data-prefix=""><code>    ->assertSee('Test Ticket');</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-300 text-base-content mt-12">
+        <aside>
+            <p>OpsHub テストドキュメント - PHPUnit編</p>
+        </aside>
+    </footer>
+</body>
+
+</html>

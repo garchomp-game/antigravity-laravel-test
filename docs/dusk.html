@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel Dusk 解説 - ブラウザE2Eテスト</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-base-200">
+    <!-- Navbar -->
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="flex-1">
+            <a href="index.html" class="btn btn-ghost text-xl">📚 Laravel テスト・監査ドキュメント</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="phpunit.html">PHPUnit</a></li>
+                <li><a href="dusk.html" class="font-bold text-secondary">Laravel Dusk</a></li>
+                <li><a href="audit.html">監査ログ</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-secondary to-primary py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold text-white mb-4">🌐 Laravel Dusk</h1>
+            <p class="text-white/80">実際のブラウザでEnd-to-Endテストを自動化</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-12">
+
+        <!-- What is Dusk -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">🔍 Laravel Dusk とは？</h2>
+
+                <div class="alert alert-info mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        class="stroke-current shrink-0 w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h3 class="font-bold">E2E (End-to-End) テスト</h3>
+                        <p>ユーザーと同じように実際のブラウザを操作してテスト。JavaScript、CSS、非同期処理すべてが動作する環境でテスト可能。</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card bg-base-200">
+                        <div class="card-body items-center text-center">
+                            <div class="text-4xl mb-2">🖥️</div>
+                            <h3 class="font-bold">実ブラウザ</h3>
+                            <p class="text-sm">Chrome/Firefoxを実際に操作</p>
+                        </div>
+                    </div>
+                    <div class="card bg-base-200">
+                        <div class="card-body items-center text-center">
+                            <div class="text-4xl mb-2">📸</div>
+                            <h3 class="font-bold">スクリーンショット</h3>
+                            <p class="text-sm">失敗時に自動でキャプチャ</p>
+                        </div>
+                    </div>
+                    <div class="card bg-base-200">
+                        <div class="card-body items-center text-center">
+                            <div class="text-4xl mb-2">⏱️</div>
+                            <h3 class="font-bold">待機処理</h3>
+                            <p class="text-sm">Ajax完了まで自動待機</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">🏗️ Docker環境でのDuskアーキテクチャ</h2>
+
+                <div class="bg-base-200 p-8 rounded-xl">
+                    <div class="flex flex-col lg:flex-row items-center justify-center gap-4">
+
+                        <!-- App Container -->
+                        <div class="flex flex-col items-center">
+                            <div
+                                class="w-40 h-32 bg-primary text-primary-content rounded-lg flex flex-col items-center justify-center p-4 border-4 border-primary-focus">
+                                <div class="text-2xl">🐳</div>
+                                <div class="font-bold text-sm">App Container</div>
+                                <div class="text-xs opacity-70">php artisan dusk</div>
+                            </div>
+                            <div class="mt-2 text-xs text-center">テスト実行</div>
+                        </div>
+
+                        <!-- Arrow 1 -->
+                        <div class="flex flex-col items-center">
+                            <div class="hidden lg:block text-3xl">→</div>
+                            <div class="lg:hidden text-3xl">↓</div>
+                            <div class="text-xs mt-1">WebDriver API</div>
+                        </div>
+
+                        <!-- Selenium Container -->
+                        <div class="flex flex-col items-center">
+                            <div
+                                class="w-40 h-32 bg-secondary text-secondary-content rounded-lg flex flex-col items-center justify-center p-4 border-4 border-secondary-focus">
+                                <div class="text-2xl">🔄</div>
+                                <div class="font-bold text-sm">Selenium</div>
+                                <div class="text-xs opacity-70">Chrome Driver</div>
+                            </div>
+                            <div class="mt-2 text-xs text-center">ブラウザ制御</div>
+                        </div>
+
+                        <!-- Arrow 2 -->
+                        <div class="flex flex-col items-center">
+                            <div class="hidden lg:block text-3xl">→</div>
+                            <div class="lg:hidden text-3xl">↓</div>
+                            <div class="text-xs mt-1">HTTP Request</div>
+                        </div>
+
+                        <!-- Web Container -->
+                        <div class="flex flex-col items-center">
+                            <div
+                                class="w-40 h-32 bg-accent text-accent-content rounded-lg flex flex-col items-center justify-center p-4 border-4 border-accent-focus">
+                                <div class="text-2xl">🌐</div>
+                                <div class="font-bold text-sm">Web Container</div>
+                                <div class="text-xs opacity-70">Nginx + PHP-FPM</div>
+                            </div>
+                            <div class="mt-2 text-xs text-center">アプリ配信</div>
+                        </div>
+                    </div>
+
+                    <!-- Network explanation -->
+                    <div class="mt-8 text-center">
+                        <div class="badge badge-lg badge-ghost">opshub network（Docker内部ネットワーク）</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <h3 class="font-bold">重要ポイント</h3>
+                        <p>Selenium → Web へのアクセスは<code
+                                class="mx-1">http://web</code>（Docker内部ホスト名）を使用。<code>localhost</code>は使用不可！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup Steps -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">⚙️ Docker環境セットアップ</h2>
+
+                <ul class="steps steps-vertical lg:steps-horizontal w-full mb-8">
+                    <li class="step step-primary">Selenium追加</li>
+                    <li class="step step-primary">.env.dusk.local作成</li>
+                    <li class="step step-primary">DuskTestCase設定</li>
+                    <li class="step step-primary">DB準備</li>
+                    <li class="step step-primary">テスト実行</li>
+                </ul>
+
+                <!-- Step 1 -->
+                <div class="collapse collapse-plus bg-base-200 mb-4">
+                    <input type="radio" name="setup-accordion" checked="checked" />
+                    <div class="collapse-title text-xl font-medium">
+                        <span class="badge badge-primary mr-2">1</span> docker-compose.yml にSelenium追加
+                    </div>
+                    <div class="collapse-content">
+                        <div class="mockup-code">
+                            <pre data-prefix=""><code># docker-compose.yml</code></pre>
+                            <pre data-prefix=""><code>selenium:</code></pre>
+                            <pre data-prefix=""><code>  image: selenium/standalone-chrome:latest</code></pre>
+                            <pre data-prefix=""><code>  ports:</code></pre>
+                            <pre data-prefix=""><code>    - "4444:4444"   # WebDriver API</code></pre>
+                            <pre data-prefix=""
+                                class="text-success"><code>    - "7900:7900"   # VNC Viewer (デバッグ用)</code></pre>
+                            <pre data-prefix=""><code>  shm_size: 2gb</code></pre>
+                            <pre data-prefix=""><code>  networks:</code></pre>
+                            <pre data-prefix=""><code>    - opshub</code></pre>
+                        </div>
+                        <div class="alert alert-info mt-4">
+                            <span>💡 VNCビューアでブラウザの動きを見たい場合: <code>http://localhost:7900</code></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="collapse collapse-plus bg-base-200 mb-4">
+                    <input type="radio" name="setup-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        <span class="badge badge-primary mr-2">2</span> .env.dusk.local 作成
+                    </div>
+                    <div class="collapse-content">
+                        <div class="mockup-code">
+                            <pre data-prefix=""><code># .env.dusk.local</code></pre>
+                            <pre data-prefix=""
+                                class="text-warning"><code>APP_URL=http://web   # Docker内部ホスト名</code></pre>
+                            <pre data-prefix=""><code></code></pre>
+                            <pre data-prefix=""><code>DB_HOST=db</code></pre>
+                            <pre data-prefix=""><code>DB_DATABASE=opshub</code></pre>
+                            <pre data-prefix=""><code></code></pre>
+                            <pre data-prefix=""
+                                class="text-success"><code>DUSK_DRIVER_URL=http://selenium:4444/wd/hub</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="collapse collapse-plus bg-base-200 mb-4">
+                    <input type="radio" name="setup-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        <span class="badge badge-primary mr-2">3</span> DuskTestCase.php 設定
+                    </div>
+                    <div class="collapse-content">
+                        <div class="mockup-code">
+                            <pre data-prefix=""><code>// tests/DuskTestCase.php</code></pre>
+                            <pre data-prefix=""><code>protected function driver(): RemoteWebDriver</code></pre>
+                            <pre data-prefix=""><code>{</code></pre>
+                            <pre data-prefix=""><code>    $options = (new ChromeOptions)->addArguments([</code></pre>
+                            <pre data-prefix=""><code>        '--window-size=1920,1080',</code></pre>
+                            <pre data-prefix=""
+                                class="text-warning"><code>        '--no-sandbox',           // Docker必須</code></pre>
+                            <pre data-prefix=""
+                                class="text-warning"><code>        '--disable-dev-shm-usage', // メモリ対策</code></pre>
+                            <pre data-prefix=""><code>        '--headless=new',</code></pre>
+                            <pre data-prefix=""><code>    ]);</code></pre>
+                            <pre data-prefix=""><code></code></pre>
+                            <pre data-prefix=""
+                                class="text-success"><code>    $url = env('DUSK_DRIVER_URL', 'http://selenium:4444/wd/hub');</code></pre>
+                            <pre data-prefix=""><code>    return RemoteWebDriver::create($url, ...);</code></pre>
+                            <pre data-prefix=""><code>}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 & 5 -->
+                <div class="collapse collapse-plus bg-base-200 mb-4">
+                    <input type="radio" name="setup-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        <span class="badge badge-primary mr-2">4-5</span> 実行コマンド
+                    </div>
+                    <div class="collapse-content">
+                        <div class="mockup-code">
+                            <pre data-prefix="$"><code># DB準備（初回のみ）</code></pre>
+                            <pre data-prefix="$"
+                                class="text-warning"><code>docker compose exec app php artisan migrate:fresh --seed --env=dusk.local</code></pre>
+                            <pre data-prefix=""><code></code></pre>
+                            <pre data-prefix="$"><code># Selenium起動</code></pre>
+                            <pre data-prefix="$"><code>docker compose up -d selenium</code></pre>
+                            <pre data-prefix=""><code></code></pre>
+                            <pre data-prefix="$"><code># テスト実行</code></pre>
+                            <pre data-prefix="$"
+                                class="text-success"><code>docker compose exec app php artisan dusk</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Example -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">📝 テスト例</h2>
+
+                <div class="mockup-code">
+                    <pre data-prefix="1"><code>class LoginTest extends DuskTestCase</code></pre>
+                    <pre data-prefix="2"><code>{</code></pre>
+                    <pre data-prefix="3"><code>    public function test_user_can_login(): void</code></pre>
+                    <pre data-prefix="4"><code>    {</code></pre>
+                    <pre data-prefix="5"
+                        class="text-warning"><code>        $this->browse(function (Browser $browser) {</code></pre>
+                    <pre data-prefix="6"><code>            $browser</code></pre>
+                    <pre data-prefix="7"><code>                ->logout()                    // 既存セッションクリア</code></pre>
+                    <pre data-prefix="8"><code>                ->visit('/login')             // ページ遷移</code></pre>
+                    <pre data-prefix="9"><code>                ->type('email', 'admin@demo.test')   // 入力</code></pre>
+                    <pre data-prefix="10"><code>                ->type('password', 'password')</code></pre>
+                    <pre data-prefix="11"
+                        class="text-success"><code>                ->click('button[type="submit"]')     // クリック</code></pre>
+                    <pre data-prefix="12"><code>                ->pause(2000)                 // 待機</code></pre>
+                    <pre data-prefix="13"
+                        class="text-info"><code>                ->assertPathIsNot('/login');  // アサーション</code></pre>
+                    <pre data-prefix="14"><code>        });</code></pre>
+                    <pre data-prefix="15"><code>    }</code></pre>
+                    <pre data-prefix="16"><code>}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Methods -->
+        <div class="card bg-base-100 shadow-xl mb-12">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">🛠️ よく使うメソッド</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>カテゴリ</th>
+                                <th>メソッド</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="3"><span class="badge badge-primary">ナビゲーション</span></td>
+                                <td><code>visit('/path')</code></td>
+                                <td>ページ遷移</td>
+                            </tr>
+                            <tr>
+                                <td><code>back()</code></td>
+                                <td>ブラウザの戻る</td>
+                            </tr>
+                            <tr>
+                                <td><code>refresh()</code></td>
+                                <td>リロード</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="4"><span class="badge badge-secondary">入力</span></td>
+                                <td><code>type('field', 'value')</code></td>
+                                <td>テキスト入力</td>
+                            </tr>
+                            <tr>
+                                <td><code>select('field', 'value')</code></td>
+                                <td>セレクトボックス選択</td>
+                            </tr>
+                            <tr>
+                                <td><code>check('checkbox')</code></td>
+                                <td>チェックボックスON</td>
+                            </tr>
+                            <tr>
+                                <td><code>attach('file', '/path')</code></td>
+                                <td>ファイルアップロード</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3"><span class="badge badge-accent">クリック</span></td>
+                                <td><code>click('selector')</code></td>
+                                <td>要素クリック</td>
+                            </tr>
+                            <tr>
+                                <td><code>press('Button Text')</code></td>
+                                <td>ボタンをテキストで指定</td>
+                            </tr>
+                            <tr>
+                                <td><code>clickLink('Link Text')</code></td>
+                                <td>リンククリック</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3"><span class="badge badge-info">待機</span></td>
+                                <td><code>pause(1000)</code></td>
+                                <td>ミリ秒待機</td>
+                            </tr>
+                            <tr>
+                                <td><code>waitFor('selector')</code></td>
+                                <td>要素表示まで待機</td>
+                            </tr>
+                            <tr>
+                                <td><code>waitForText('text')</code></td>
+                                <td>テキスト出現まで待機</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="4"><span class="badge badge-success">アサーション</span></td>
+                                <td><code>assertSee('text')</code></td>
+                                <td>テキスト存在確認</td>
+                            </tr>
+                            <tr>
+                                <td><code>assertPathIs('/path')</code></td>
+                                <td>URL確認</td>
+                            </tr>
+                            <tr>
+                                <td><code>assertPresent('selector')</code></td>
+                                <td>要素存在確認</td>
+                            </tr>
+                            <tr>
+                                <td><code>assertAuthenticated()</code></td>
+                                <td>ログイン状態確認</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-2xl mb-6">🔧 トラブルシューティング</h2>
+
+                <div class="space-y-4">
+                    <div class="alert alert-error">
+                        <div>
+                            <h3 class="font-bold">ERR_CONNECTION_REFUSED</h3>
+                            <p>SeleniumがAppに接続できない</p>
+                            <p class="text-sm mt-2">✅ 解決: <code>APP_URL=http://web</code>（Docker内部ホスト名を使用）</p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-error">
+                        <div>
+                            <h3 class="font-bold">Table not found</h3>
+                            <p>DBテーブルが存在しない</p>
+                            <p class="text-sm mt-2">✅ 解決: <code>php artisan migrate:fresh --seed --env=dusk.local</code>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-error">
+                        <div>
+                            <h3 class="font-bold">Unable to locate button</h3>
+                            <p>ボタンのテキストが見つからない</p>
+                            <p class="text-sm mt-2">✅ 解決: CSSセレクタを使用 <code>click('button[type="submit"]')</code></p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-error">
+                        <div>
+                            <h3 class="font-bold">前のテストのセッションが残る</h3>
+                            <p>ログイン状態が引き継がれる</p>
+                            <p class="text-sm mt-2">✅ 解決: テスト開始時に <code>$browser->logout()</code> を呼ぶ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-300 text-base-content mt-12">
+        <aside>
+            <p>OpsHub テストドキュメント - Laravel Dusk編</p>
+        </aside>
+    </footer>
+</body>
+
+</html>

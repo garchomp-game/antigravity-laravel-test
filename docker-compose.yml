@@ -1,0 +1,138 @@
+services:
+  # Nginx Web Server
+  web:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - opshub
+
+  # PHP-FPM Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-opshub}
+      - DB_USERNAME=${DB_USERNAME:-opshub}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - opshub
+
+  # Queue Worker
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - .:/var/www/html
+    command: php artisan queue:work --sleep=3 --tries=3
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-opshub}
+      - DB_USERNAME=${DB_USERNAME:-opshub}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - opshub
+
+  # Scheduler
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - .:/var/www/html
+    command: php artisan schedule:work
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-opshub}
+      - DB_USERNAME=${DB_USERNAME:-opshub}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - opshub
+
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=${DB_DATABASE:-opshub}
+      - POSTGRES_USER=${DB_USERNAME:-opshub}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - opshub
+
+  # Redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - opshub
+
+  # Selenium for Dusk browser testing
+  selenium:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    environment:
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_VNC_NO_PASSWORD=1
+    shm_size: 2gb
+    networks:
+      - opshub
+
+networks:
+  opshub:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
