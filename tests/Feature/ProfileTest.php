@@ -27,7 +27,9 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['_token' => 'test-token'])
             ->patch('/profile', [
+                '_token' => 'test-token',
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
@@ -49,7 +51,9 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['_token' => 'test-token'])
             ->patch('/profile', [
+                '_token' => 'test-token',
                 'name' => 'Test User',
                 'email' => $user->email,
             ]);
@@ -67,7 +71,9 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['_token' => 'test-token'])
             ->delete('/profile', [
+                '_token' => 'test-token',
                 'password' => 'password',
             ]);
 
@@ -85,8 +91,10 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['_token' => 'test-token'])
             ->from('/profile')
             ->delete('/profile', [
+                '_token' => 'test-token',
                 'password' => 'wrong-password',
             ]);
 

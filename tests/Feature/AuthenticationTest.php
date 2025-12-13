@@ -47,10 +47,13 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $response = $this->post('/login', [
-            'email' => 'test@example.com',
-            'password' => 'password',
-        ]);
+        $response = $this
+            ->withSession(['_token' => 'test-token'])
+            ->post('/login', [
+                '_token' => 'test-token',
+                'email' => 'test@example.com',
+                'password' => 'password',
+            ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
@@ -58,17 +61,25 @@ class AuthenticationTest extends TestCase
 
     public function test_users_cannot_authenticate_with_invalid_password(): void
     {
-        $response = $this->post('/login', [
-            'email' => 'test@example.com',
-            'password' => 'wrong-password',
-        ]);
+        $response = $this
+            ->withSession(['_token' => 'test-token'])
+            ->post('/login', [
+                '_token' => 'test-token',
+                'email' => 'test@example.com',
+                'password' => 'wrong-password',
+            ]);
 
         $this->assertGuest();
     }
 
     public function test_users_can_logout(): void
     {
-        $response = $this->actingAs($this->user)->post('/logout');
+        $response = $this
+            ->actingAs($this->user)
+            ->withSession(['_token' => 'test-token'])
+            ->post('/logout', [
+                '_token' => 'test-token',
+            ]);
 
         $this->assertGuest();
         $response->assertRedirect('/');

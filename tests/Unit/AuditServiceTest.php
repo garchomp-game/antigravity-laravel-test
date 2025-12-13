@@ -12,6 +12,7 @@ use App\Services\TicketService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AuditServiceTest extends TestCase
@@ -45,7 +46,7 @@ class AuditServiceTest extends TestCase
         $this->auditService = app(AuditService::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_record_an_audit_log(): void
     {
         $this->actingAs($this->user);
@@ -68,7 +69,7 @@ class AuditServiceTest extends TestCase
         $this->assertEquals($this->tenant->id, $auditLog->tenant_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_records_audit_when_ticket_is_created(): void
     {
         $this->actingAs($this->user);
@@ -102,7 +103,7 @@ class AuditServiceTest extends TestCase
         $this->assertArrayHasKey('title', $auditLog->meta);
     }
 
-    /** @test */
+    #[Test]
     public function it_records_audit_when_ticket_is_assigned(): void
     {
         $this->actingAs($this->user);
@@ -143,7 +144,7 @@ class AuditServiceTest extends TestCase
         $this->assertEquals($assignee->id, $auditLog->meta['new_assignee']);
     }
 
-    /** @test */
+    #[Test]
     public function it_records_audit_when_ticket_status_transitions(): void
     {
         $this->actingAs($this->user);
@@ -165,7 +166,7 @@ class AuditServiceTest extends TestCase
         $this->assertEquals('in_progress', $auditLog->meta['to_status']);
     }
 
-    /** @test */
+    #[Test]
     public function it_records_audit_when_comment_is_added(): void
     {
         $this->actingAs($this->user);
@@ -186,7 +187,7 @@ class AuditServiceTest extends TestCase
         $this->assertArrayHasKey('comment_id', $auditLog->meta);
     }
 
-    /** @test */
+    #[Test]
     public function audit_logs_are_scoped_to_tenant(): void
     {
         $this->actingAs($this->user);

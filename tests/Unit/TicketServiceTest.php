@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\TicketService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TicketServiceTest extends TestCase
@@ -57,7 +58,7 @@ class TicketServiceTest extends TestCase
         $this->ticketService = app(TicketService::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_ticket(): void
     {
         $this->actingAs($this->user);
@@ -79,7 +80,7 @@ class TicketServiceTest extends TestCase
         $this->assertEquals($this->tenant->id, $ticket->tenant_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_assign_a_ticket(): void
     {
         $this->actingAs($this->user);
@@ -101,7 +102,7 @@ class TicketServiceTest extends TestCase
         $this->assertEquals($assignee->id, $updatedTicket->assigned_to);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_transition_ticket_status(): void
     {
         $this->actingAs($this->user);
@@ -118,7 +119,7 @@ class TicketServiceTest extends TestCase
         $this->assertEquals('in_progress', $updatedTicket->status);
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_make_invalid_status_transition(): void
     {
         $this->actingAs($this->user);
@@ -137,7 +138,7 @@ class TicketServiceTest extends TestCase
         $this->ticketService->transitionStatus($ticket, 'new');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_comment_to_ticket(): void
     {
         $this->actingAs($this->user);

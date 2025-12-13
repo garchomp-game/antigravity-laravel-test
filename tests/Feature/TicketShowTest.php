@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TicketShowTest extends TestCase
@@ -67,7 +68,7 @@ class TicketShowTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_user_can_view_ticket_detail(): void
     {
         $response = $this->actingAs($this->user)
@@ -78,7 +79,7 @@ class TicketShowTest extends TestCase
         $response->assertSee('Test description');
     }
 
-    /** @test */
+    #[Test]
     public function ticket_show_displays_ticket_events(): void
     {
         TicketEvent::create([
@@ -95,7 +96,7 @@ class TicketShowTest extends TestCase
             ->assertSee('This is a test comment');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_add_comment_to_ticket(): void
     {
         $this->actingAs($this->user);
@@ -112,7 +113,7 @@ class TicketShowTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_change_ticket_status(): void
     {
         $this->actingAs($this->user);
@@ -125,7 +126,7 @@ class TicketShowTest extends TestCase
         $this->assertEquals('in_progress', $this->ticket->status);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_assign_ticket(): void
     {
         $assignee = User::create([
@@ -146,7 +147,7 @@ class TicketShowTest extends TestCase
         $this->assertEquals($assignee->id, $this->ticket->assigned_to);
     }
 
-    /** @test */
+    #[Test]
     public function guest_cannot_view_ticket_detail(): void
     {
         $response = $this->get("/t/{$this->tenant->slug}/tickets/{$this->ticket->id}");

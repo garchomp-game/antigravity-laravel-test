@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TicketFeatureTest extends TestCase
@@ -54,7 +55,7 @@ class TicketFeatureTest extends TestCase
         $this->user->assignRole('agent');
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_user_can_view_ticket_list(): void
     {
         Ticket::create([
@@ -72,7 +73,7 @@ class TicketFeatureTest extends TestCase
         $response->assertSee('Test Ticket');
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_user_can_create_ticket(): void
     {
         $this->actingAs($this->user);
@@ -93,7 +94,7 @@ class TicketFeatureTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function ticket_list_shows_only_tenant_tickets(): void
     {
         Ticket::create([
@@ -130,7 +131,7 @@ class TicketFeatureTest extends TestCase
         $response->assertDontSee('Other Tenant Ticket');
     }
 
-    /** @test */
+    #[Test]
     public function ticket_list_can_filter_by_status(): void
     {
         Ticket::create([
@@ -157,7 +158,7 @@ class TicketFeatureTest extends TestCase
             ->assertDontSee('In Progress Ticket');
     }
 
-    /** @test */
+    #[Test]
     public function ticket_list_can_search_by_title(): void
     {
         Ticket::create([
@@ -184,7 +185,7 @@ class TicketFeatureTest extends TestCase
             ->assertDontSee('Laptop Request');
     }
 
-    /** @test */
+    #[Test]
     public function guest_cannot_access_ticket_list(): void
     {
         $response = $this->get("/t/{$this->tenant->slug}/tickets");
@@ -192,7 +193,7 @@ class TicketFeatureTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    /** @test */
+    #[Test]
     public function dashboard_shows_ticket_statistics(): void
     {
         Ticket::create([
