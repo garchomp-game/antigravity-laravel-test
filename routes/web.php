@@ -46,7 +46,7 @@ Route::middleware(['auth', TenantContext::class])
         })->name('tickets.show');
 
         // Admin
-        Route::prefix('admin')->name('admin.')->group(function () {
+        Route::prefix('admin')->name('admin.')->middleware('can:admin.users.manage')->group(function () {
             Route::get('/users', function () {
                 return view('tenant.admin.users');
             })->name('users.index');
@@ -55,7 +55,7 @@ Route::middleware(['auth', TenantContext::class])
         // Audit
         Route::get('/audit', function () {
             return view('tenant.audit.index');
-        })->name('audit.index');
+        })->middleware('can:audit.read')->name('audit.index');
     });
 
 require __DIR__.'/auth.php';

@@ -23,6 +23,12 @@ class TenantContext
                 abort(404, 'Tenant not found');
             }
 
+            // Check if authenticated user belongs to this tenant
+            $user = $request->user();
+            if ($user && $user->tenant_id !== $tenant->id) {
+                abort(404, 'Tenant not found');
+            }
+
             // Set the current tenant
             Tenant::setCurrent($tenant);
 
