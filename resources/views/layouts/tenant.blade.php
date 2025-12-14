@@ -25,6 +25,7 @@
                 <li><a href="{{ route('tenant.admin.users.index', ['tenant' => request()->route('tenant')]) }}">Users</a></li>
                 <li><a href="{{ route('tenant.audit.index', ['tenant' => request()->route('tenant')]) }}">Audit</a></li>
             </ul>
+            <livewire:tenant-switcher :currentTenantSlug="request()->route('tenant')" />
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
                     <div class="bg-neutral text-neutral-content w-10 rounded-full">

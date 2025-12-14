@@ -84,4 +84,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ticket::class, 'assigned_to');
     }
+
+    /**
+     * Get all tenants this user belongs to (multi-tenant support).
+     */
+    public function tenants(): BelongsToMany
+    {
+        return $this->belongsToMany(Tenant::class, 'tenant_users')
+            ->withPivot('role', 'is_primary')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if the user can access the given tenant.
+     */
+    public function canAccessTenant(Tenant $tenant): bool
+    {
+        return $this->tenants()->where('tenants.id', $tenant->id)->exists();
+    }
 }

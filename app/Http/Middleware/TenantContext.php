@@ -25,8 +25,12 @@ class TenantContext
 
             // Check if authenticated user belongs to this tenant
             $user = $request->user();
-            if ($user && $user->tenant_id !== $tenant->id) {
-                abort(404, 'Tenant not found');
+            if ($user) {
+                // Multi-tenant: check tenant_users pivot table first, fallback to tenant_id
+                $canAccess = $user->canAccessTenant($tenant) || $user->tenant_id === $tenant->id;
+                if (!$canAccess) {
+                    abort(404, 'Tenant not found');
+                }
             }
 
             // Set the current tenant
