@@ -5,7 +5,26 @@ use App\Http\Middleware\TenantContext;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        $user = auth()->user();
+        
+        // Try to get primary tenant from pivot table
+        $primaryTenant = $user->tenants()->wherePivot('is_primary', true)->first();
+        
+        // Fallback to user's tenant_id
+        if (!$primaryTenant && $user->tenant) {
+            $primaryTenant = $user->tenant;
+        }
+        
+        if ($primaryTenant) {
+            return redirect()->route('tenant.dashboard', ['tenant' => $primaryTenant->slug]);
+        }
+        
+        // No tenant found - show dashboard without tenant context
+        return redirect()->route('dashboard');
+    }
+    
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
